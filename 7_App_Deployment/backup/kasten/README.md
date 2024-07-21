@@ -11,12 +11,12 @@ touch kasten-policy.json
 aws iam create-policy --policy-name my-policy --policy-document file://my-policy.json
 aws iam create-policy --policy-name kasten-policy --policy-document file://kasten-policy.json
 ARN:arn:aws:iam::440705253136:policy/kasten-policy
-PolicyID: ANPAWNHAUP4IPSJRDI36O
 
 
-### Create and IAM role and associate it to a kubernetes service account (you can use eksctl or aws cli)
+
+### Create and IAM role and associate it to a kubernetes service account (you can use eksctl or aws cli, change service account name, cluster name, rolename, policyarn and policyname)
 eksctl create iamserviceaccount --name my-service-account --namespace default --cluster my-cluster --role-name my-role \
-    --attach-policy-arn arn:aws:iam::111122223333:policy/my-policy --approve
+    --attach-policy-arn arn:aws:iam::111122223333:policy/my-policy(policyname) --approve
 eksctl create iamserviceaccount --name kasten-sa --namespace kasten --cluster eks-cluster-1 --role-name kasten-role \
     --attach-policy-arn arn:aws:iam::440705253136:policy/kasten-policy --approve
 
@@ -28,8 +28,8 @@ aws iam get-role --role-name kasten-role --query Role.AssumeRolePolicyDocument
 aws iam list-attached-role-policies --role-name my-role --query AttachedPolicies[].PolicyArn --output text
 aws iam list-attached-role-policies --role-name kasten-role 
 
-### create a variable to store the arn of the policy you want to use 
-export policy_arn=arn:aws:iam::440705253136:policy/kasten-policy
+### create a variable to store the arn of the policy you want to use (use your own policy arn)
+export policy_arn=arn:aws:iam::440705363136:policy/kasten-policy
 
 ### Get the default version of the policy 
 aws iam get-policy --policy-arn $policy_arn
@@ -37,7 +37,7 @@ aws iam get-policy --policy-arn $policy_arn
 ### To view the policy to make sure that it has all the permissions your pods need 
 aws iam get-policy-version --policy-arn $policy_arn --version-id v1
 
-### confirm that the kubernetes service account is annotated with the role 
+### confirm that the kubernetes service account is annotated with the role (change the service account name and namespace to yours)
 kubectl describe serviceaccount kasten-sa -n kasten
 
 ### Install kasten with helm chart 
